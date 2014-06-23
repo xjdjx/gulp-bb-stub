@@ -1,0 +1,10 @@
+{
+  "name": "gulp-bb-stub",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.11.0",
+    "requirejs": "~2.1.14",
+    "backbone": "~1.1.2"
+  },
+  "devDependencies": {}
+}
