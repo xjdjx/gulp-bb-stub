@@ -1,23 +1,19 @@
 define (
-	['jquery','underscore','backbone'],
-	function($,_,Backbone){
+	['jquery','underscore','backbone','models/defaultModel','views/defaultView'],
+	function($,_,Backbone,DefaultModel,DefaultView){
 		'use strict';
+		var $container = $('#container');
 
-		var AppRouter = Backbone.Router.extend({
+		var Router = Backbone.Router.extend({
 			routes: {
 				'*path' : 'showDefault'
 			},
 			showDefault: function(){
-				console.log('routing default');
+				var defaultView = new DefaultView();
+				defaultView.el = $container;
+				defaultView.render();
 			}
 		});
 
-		var init = function(){
-			var router = new AppRouter;
-			Backbone.history.start({'pushState': true});
-		};
-
-		return {
-			init : init
-		};
+		return Router;
 });

@@ -2,7 +2,11 @@ requirejs.config({
     paths: {
         jquery: '../bower_components/jquery/dist/jquery',
         underscore: '../bower_components/underscore/underscore',
-        backbone: '../bower_components/backbone/backbone'
+        backbone: '../bower_components/backbone/backbone',
+        text: '../bower_components/requirejs-text/text',
+        enquire: '../bower_components/enquire/dist/enquire',
+        matchMedia: '../bower_components/matchmedia/matchMedia'
+
     },
     shim: {
         backbone: {
@@ -15,6 +19,7 @@ requirejs.config({
     }
 });
 
-require(['main'],function(Main){
-    Main.init()
+require(['main'],function(main){
+    'use strict';
+    main.init();
 });

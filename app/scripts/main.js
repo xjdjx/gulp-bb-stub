@@ -1,14 +1,13 @@
 define (
-	['router'],
-	function(Router){
+	['backbone','router'],
+	function(Backbone,Router){
 		'use strict';
 
-		var init = function(){
-			Router.init();
-		};
-
 		return {
-			init : init
+			init : function (){
+				var router = new Router();
+				Backbone.history.start({'pushState': true});
+			}
 		};
 });
 
