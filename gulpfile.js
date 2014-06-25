@@ -7,33 +7,71 @@ var gulpBowerFiles = require('gulp-bower-files');
 // load plugins
 var $ = require('gulp-load-plugins')({camelize: true});
 
+gulp.task('bower-files', function(){
+    gulpBowerFiles()
+        .pipe(gulp.dest("dist/bower-components"));
+});
+
+gulp.task('ejs', ['move-index'],function(){
+    return gulp.src(['.tmp/global/','.tmp/pages/'])
+        .pipe($.clean());
+});
+
+gulp.task('move-index', ['process-ejs'],function(){
+    return gulp.src('.tmp/pages/**/*.html')
+        .pipe(gulp.dest('.tmp'));
+});
+
+gulp.task('process-ejs',function(){
+    return gulp.src('app/**/*.ejs')
+        .pipe($.ejs({}))
+        .pipe(gulp.dest('.tmp'));
+});
+
 gulp.task('styles', function () {
-    return gulp.src('app/styles/main.scss')
+    return gulp.src('app/global/css/main.scss')
         .pipe($.rubySass({
             style: 'expanded',
             precision: 10
         }))
         .pipe($.autoprefixer('last 1 version'))
-        .pipe(gulp.dest('.tmp/styles'))
+        .pipe(gulp.dest('.tmp/css'))
         .pipe($.size());
 });
 
 gulp.task('scripts', function () {
-    return gulp.src('app/scripts/**/*.js')
+    return gulp.src('app/global/**/*.js')
         .pipe($.jshint())
         .pipe($.jshint.reporter(require('jshint-stylish')))
-        .pipe($.size());
+        .pipe($.size())
+        .pipe(gulp.dest('.tmp/'));
 });
 
-gulp.task('html', ['styles', 'scripts'], function () {
+gulp.task('html', ['ejs','styles', 'scripts','bower-files'], function () {
     var jsFilter = $.filter('**/*.js');
     var cssFilter = $.filter('**/*.css');
 
-    return gulp.src('app/*.html')
-        .pipe($.useref.assets({searchPath: '{.tmp,app}'}))
+    return gulp.src('.tmp/**/*')
         .pipe(jsFilter)
         .pipe($.uglify())
         .pipe(jsFilter.restore())
+        .pipe(cssFilter)
+        .pipe($.csso())
+        .pipe(cssFilter.restore())
+        .pipe(gulp.dest('dist'))
+        .pipe($.size());
+
+    return gulp.src('.tmp/**/*.js')
+        .pipe($.uglify())
+        .pipe(gulp.dest('dist'))
+
+
+
+    return gulp.src('.tmp/*.html')
+        .pipe($.useref.assets({searchPath: '{.tmp,app}'}))
+        // .pipe(jsFilter)
+        // .pipe($.uglify())
+        // .pipe(jsFilter.restore())
         .pipe(cssFilter)
         .pipe($.csso())
         .pipe(cssFilter.restore())
@@ -71,7 +109,7 @@ gulp.task('clean', function () {
     return gulp.src(['.tmp', 'dist'], { read: false }).pipe($.clean());
 });
 
-gulp.task('build', ['html','bower-scripts', 'images', 'fonts', 'extras']);
+gulp.task('build', ['html', 'images', 'fonts', 'extras']);
 
 gulp.task('default', ['clean'], function () {
     gulp.start('build');
@@ -92,33 +130,8 @@ gulp.task('connect', function () {
         });
 });
 
-gulp.task('serve', ['connect', 'styles'], function () {
+gulp.task('serve', ['connect', 'ejs', 'styles', 'scripts'], function () {
     require('opn')('http://localhost:9000');
-});
-
-// inject bower components
-gulp.task('wiredep', function () {
-    var wiredep = require('wiredep').stream;
-
-    gulp.src('app/styles/*.scss')
-        .pipe(wiredep({
-            directory: 'app/bower_components'
-        }))
-        .pipe(gulp.dest('app/styles'));
-
-    gulp.src('app/*.html')
-        .pipe(wiredep({
-            directory: 'app/bower_components'
-        }))
-        .pipe(gulp.dest('app'));
-});
-
-gulp.task('bower-scripts',function(){
-    var requireFilter = $.filter('!**/require.js');
-    gulpBowerFiles()
-        .pipe(requireFilter)
-        .pipe($.uglify())
-        .pipe(gulp.dest('dist/scripts/lib/bower'));
 });
 
 gulp.task('watch', ['connect', 'serve'], function () {
@@ -127,16 +140,17 @@ gulp.task('watch', ['connect', 'serve'], function () {
     // watch for changes
 
     gulp.watch([
-        'app/**/*.html',
-        '.tmp/styles/**/*.css',
-        'app/scripts/**/*.js',
+        '.tmp/**/*.html',
+        '.tmp/css/**/*.css',
+        'app/global/js/**/*.js',
         'app/images/**/*'
     ]).on('change', function (file) {
         server.changed(file.path);
     });
 
-    gulp.watch('app/styles/**/*.scss', ['styles']);
-    gulp.watch('app/scripts/**/*.js', ['scripts']);
+    gulp.watch('app/**/*.ejs', ['ejs']);
+    gulp.watch('app/**/*.scss', ['styles']);
+    gulp.watch('app/global/js/**/*.js', ['scripts']);
     gulp.watch('app/images/**/*', ['images']);
     gulp.watch('bower.json', ['wiredep']);
 });
