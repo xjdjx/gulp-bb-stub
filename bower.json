@@ -9,5 +9,10 @@
     "enquire": "~2.1.1",
     "matchmedia": "~0.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "overrides": {
+    "BOWER-PACKAGE":{
+      "ignore" : ["requirejs"]
+    }
+  }
 }

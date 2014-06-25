@@ -2,9 +2,10 @@
 // generated on 2014-06-20 using generator-gulp-webapp 0.1.0
 
 var gulp = require('gulp');
+var gulpBowerFiles = require('gulp-bower-files');
 
 // load plugins
-var $ = require('gulp-load-plugins')();
+var $ = require('gulp-load-plugins')({camelize: true});
 
 gulp.task('styles', function () {
     return gulp.src('app/styles/main.scss')
@@ -70,7 +71,7 @@ gulp.task('clean', function () {
     return gulp.src(['.tmp', 'dist'], { read: false }).pipe($.clean());
 });
 
-gulp.task('build', ['html', 'images', 'fonts', 'extras']);
+gulp.task('build', ['html','bower-scripts', 'images', 'fonts', 'extras']);
 
 gulp.task('default', ['clean'], function () {
     gulp.start('build');
@@ -110,6 +111,14 @@ gulp.task('wiredep', function () {
             directory: 'app/bower_components'
         }))
         .pipe(gulp.dest('app'));
+});
+
+gulp.task('bower-scripts',function(){
+    var requireFilter = $.filter('!**/require.js');
+    gulpBowerFiles()
+        .pipe(requireFilter)
+        .pipe($.uglify())
+        .pipe(gulp.dest('dist/scripts/lib/bower'));
 });
 
 gulp.task('watch', ['connect', 'serve'], function () {

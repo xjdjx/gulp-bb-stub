@@ -2,7 +2,9 @@
   "name": "gulp-bb-stub",
   "version": "0.0.0",
   "dependencies": {
-    "gulp-file-include": "~0.3.1"
+    "gulp-file-include": "~0.3.1",
+    "gulp-bower-src": "~0.1.0",
+    "gulp-bower-files": "~0.2.5"
   },
   "devDependencies": {
     "connect": "^2.14.4",
@@ -25,7 +27,8 @@
     "gulp-useref": "^0.4.2",
     "jshint-stylish": "^0.2.0",
     "opn": "^0.1.1",
-    "wiredep": "^1.4.3"
+    "wiredep": "^1.4.3",
+    "gulp-concat": "~2.2.0"
   },
   "engines": {
     "node": ">=0.10.0"
